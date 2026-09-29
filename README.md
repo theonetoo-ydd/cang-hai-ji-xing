@@ -86,6 +86,24 @@ cang-hai-ji-xing/
 **M4：历史与内容扩展**
 - 在核心循环稳定后再扩充真实港口、商品、人物和时代背景。
 
+## 运行项目
+
+首版技术栈已经确定为 **Godot 4.x + GDScript**。
+
+1. 安装 Godot 4.x。
+2. 用 Godot Project Manager 导入仓库根目录的 `project.godot`。
+3. 点击 **Run Project**。
+
+也可以在已经配置 Godot 命令行的环境中运行：
+
+```bash
+godot --path .
+```
+
+启动后应看到《沧海纪行》标题界面。点击“开始航行”会显示下一阶段 T03–T07 的提示。
+
+技术栈决策见 [docs/ADR-001-tech-stack.md](docs/ADR-001-tech-stack.md)。
+
 ## Git 工作流
 
 `main` 始终保持可用。日常开发从 `main` 新建短分支：
