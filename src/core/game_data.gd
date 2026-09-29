@@ -59,7 +59,7 @@ static func _load_json_array(path: String) -> Array:
 	var text := FileAccess.get_file_as_string(path)
 	var parsed = JSON.parse_string(text)
 
-	if parsed == null or not parsed is Array:
+	if parsed == null or typeof(parsed) != TYPE_ARRAY:
 		push_error("Invalid JSON array: %s" % path)
 		return []
 
