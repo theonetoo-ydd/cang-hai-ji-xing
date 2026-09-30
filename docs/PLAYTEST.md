@@ -12,7 +12,7 @@
 2. 打开 Godot Project Manager；
 3. 选择 **Import**，定位仓库根目录的 `project.godot`；
 4. 打开项目；
-5. 点击右上角 **Run Project**（F6/F5 均以项目主场景为准时，推荐直接 F6? No—使用 F5 / Run Project）；
+5. 点击右上角 **Run Project**，或按 **F5**；
 6. 游戏会从宁波港开始，初始资金 1000 两。
 
 推荐使用 **F5 / Run Project** 启动整个项目。
