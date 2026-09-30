@@ -1,5 +1,4 @@
 [gd_scene load_steps=2 format=3]
-
 [ext_resource type="Script" path="res://src/ui/main.gd" id="1_main"]
 
 [node name="Main" type="Control"]
@@ -11,167 +10,270 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="SeaBackground" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.025, 0.055, 0.075, 1)
+color = Color(0.035, 0.09, 0.11, 1)
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="OuterMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 48
-theme_override_constants/margin_top = 32
-theme_override_constants/margin_right = 48
-theme_override_constants/margin_bottom = 32
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 22
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 22
 
-[node name="MainVBox" type="VBoxContainer" parent="Margin"]
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="Title" type="Label" parent="Margin/MainVBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 38
-text = "沧海纪行"
-horizontal_alignment = 1
-
-[node name="Subtitle" type="Label" parent="Margin/MainVBox"]
-layout_mode = 2
-text = "MVP 0.3 · 港口贸易与航行"
-horizontal_alignment = 1
-
-[node name="Header" type="HBoxContainer" parent="Margin/MainVBox"]
-layout_mode = 2
-theme_override_constants/separation = 24
-
-[node name="LocationLabel" type="Label" parent="Margin/MainVBox/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
-text = "当前港口：宁波"
-
-[node name="StatsLabel" type="Label" parent="Margin/MainVBox/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "第 1 天　资金：1000　货舱：0/20"
-horizontal_alignment = 2
-
-[node name="SaveButton" type="Button" parent="Margin/MainVBox/Header"]
-custom_minimum_size = Vector2(88, 0)
-layout_mode = 2
-text = "保存"
-
-[node name="LoadButton" type="Button" parent="Margin/MainVBox/Header"]
-custom_minimum_size = Vector2(88, 0)
-layout_mode = 2
-text = "读取"
-
-[node name="Body" type="HBoxContainer" parent="Margin/MainVBox"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 18
-
-[node name="MarketPanel" type="PanelContainer" parent="Margin/MainVBox/Body"]
-custom_minimum_size = Vector2(700, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MarketVBox" type="VBoxContainer" parent="Margin/MainVBox/Body/MarketPanel"]
+[node name="RootVBox" type="VBoxContainer" parent="OuterMargin"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="MarketTitle" type="Label" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox"]
+[node name="TopBar" type="PanelContainer" parent="OuterMargin/RootVBox"]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "港口市场"
-horizontal_alignment = 1
 
-[node name="MarketList" type="ItemList" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox"]
-custom_minimum_size = Vector2(0, 290)
+[node name="TopMargin" type="MarginContainer" parent="OuterMargin/RootVBox/TopBar"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 10
+
+[node name="TopHBox" type="HBoxContainer" parent="OuterMargin/RootVBox/TopBar/TopMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Brand" type="VBoxContainer" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="Title" type="Label" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/Brand"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "沧 海 纪 行"
+[node name="Subtitle" type="Label" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/Brand"]
+layout_mode = 2
+text = "明代航海 · 贸易 · 探索"
+
+[node name="DateLabel" type="Label" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+text = "航海历 · 第 1 天"
+vertical_alignment = 1
+horizontal_alignment = 1
+[node name="MoneyLabel" type="Label" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "银两 1000"
+vertical_alignment = 1
+horizontal_alignment = 1
+[node name="SaveButton" type="Button" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox"]
+custom_minimum_size = Vector2(82, 0)
+layout_mode = 2
+text = "保存"
+[node name="LoadButton" type="Button" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox"]
+custom_minimum_size = Vector2(82, 0)
+layout_mode = 2
+text = "读取"
+
+[node name="MainTabs" type="TabContainer" parent="OuterMargin/RootVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-select_mode = 0
 
-[node name="TradeRow" type="HBoxContainer" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox"]
+[node name="港口" type="HBoxContainer" parent="OuterMargin/RootVBox/MainTabs"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="NavPanel" type="PanelContainer" parent="OuterMargin/RootVBox/MainTabs/港口"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+[node name="NavVBox" type="VBoxContainer" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
-
-[node name="QuantityText" type="Label" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow"]
+[node name="PortName" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
 layout_mode = 2
-text = "数量"
+theme_override_font_sizes/font_size = 24
+text = "宁波港"
+horizontal_alignment = 1
+[node name="PortFlavor" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
+layout_mode = 2
+text = "东海商舶云集之地"
+horizontal_alignment = 1
+autowrap_mode = 2
+[node name="NavSep" type="HSeparator" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
+layout_mode = 2
+[node name="MarketNav" type="Button" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
+layout_mode = 2
+text = "商 馆"
+[node name="ShipyardNav" type="Button" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
+layout_mode = 2
+text = "船 厂"
+disabled = true
+[node name="TavernNav" type="Button" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
+layout_mode = 2
+text = "酒 馆"
+disabled = true
+[node name="MapNav" type="Button" parent="OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox"]
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+text = "出 航 / 海 图"
 
-[node name="QuantitySpin" type="SpinBox" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow"]
+[node name="MarketPanel" type="PanelContainer" parent="OuterMargin/RootVBox/MainTabs/港口"]
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="MarketVBox" type="VBoxContainer" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="MarketHeader" type="HBoxContainer" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox"]
+layout_mode = 2
+[node name="MarketTitle" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/MarketHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "市舶商馆 · 今日行情"
+[node name="CapacityLabel" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/MarketHeader"]
+layout_mode = 2
+text = "货舱 0/20"
+[node name="MarketList" type="ItemList" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox"]
+custom_minimum_size = Vector2(0, 340)
+layout_mode = 2
+size_flags_vertical = 3
+[node name="TradeRow" type="HBoxContainer" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="QuantityText" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow"]
+layout_mode = 2
+text = "交易数量"
+[node name="QuantitySpin" type="SpinBox" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow"]
 custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 min_value = 1.0
 max_value = 99.0
 value = 1.0
-
-[node name="BuyButton" type="Button" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow"]
+[node name="BuyButton" type="Button" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "买入"
-
-[node name="SellButton" type="Button" parent="Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow"]
+text = "买 入"
+[node name="SellButton" type="Button" parent="OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "卖出"
+text = "卖 出"
 
-[node name="SidePanel" type="PanelContainer" parent="Margin/MainVBox/Body"]
-custom_minimum_size = Vector2(360, 0)
+[node name="RightPanel" type="PanelContainer" parent="OuterMargin/RootVBox/MainTabs/港口"]
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-
-[node name="SideVBox" type="VBoxContainer" parent="Margin/MainVBox/Body/SidePanel"]
+[node name="RightVBox" type="VBoxContainer" parent="OuterMargin/RootVBox/MainTabs/港口/RightPanel"]
 layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="CargoLabel" type="Label" parent="Margin/MainVBox/Body/SidePanel/SideVBox"]
-custom_minimum_size = Vector2(0, 210)
+theme_override_constants/separation = 12
+[node name="ShipTitle" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/RightPanel/RightVBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "座 船"
+[node name="ShipLabel" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/RightPanel/RightVBox"]
+layout_mode = 2
+text = "初云号\n船况 100%\n货舱 0/20"
+[node name="RightSep" type="HSeparator" parent="OuterMargin/RootVBox/MainTabs/港口/RightPanel/RightVBox"]
+layout_mode = 2
+[node name="CargoLabel" type="Label" parent="OuterMargin/RootVBox/MainTabs/港口/RightPanel/RightVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-text = "货舱\n\n（空）"
+text = "货 舱\n\n（空）"
 autowrap_mode = 2
 
-[node name="Separator" type="HSeparator" parent="Margin/MainVBox/Body/SidePanel/SideVBox"]
+[node name="航海图" type="Control" parent="OuterMargin/RootVBox/MainTabs"]
 layout_mode = 2
+[node name="MapPaper" type="ColorRect" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.72, 0.67, 0.52, 1)
+[node name="MapTitle" type="Label" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 36.0
+offset_top = 28.0
+offset_right = 430.0
+offset_bottom = 68.0
+theme_override_font_sizes/font_size = 26
+text = "东南沿海航路图"
+[node name="MapHint" type="Label" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 38.0
+offset_top = 72.0
+offset_right = 620.0
+offset_bottom = 102.0
+text = "选择可达港口，查看航程后出航。"
+[node name="Route1" type="HSeparator" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 345.0
+offset_top = 210.0
+offset_right = 595.0
+offset_bottom = 214.0
+[node name="Route2" type="HSeparator" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 595.0
+offset_top = 330.0
+offset_right = 850.0
+offset_bottom = 334.0
+[node name="NingboButton" type="Button" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 230.0
+offset_top = 170.0
+offset_right = 350.0
+offset_bottom = 230.0
+text = "宁 波"
+[node name="QuanzhouButton" type="Button" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 535.0
+offset_top = 285.0
+offset_right = 665.0
+offset_bottom = 345.0
+text = "泉 州"
+[node name="GuangzhouButton" type="Button" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 835.0
+offset_top = 390.0
+offset_right = 975.0
+offset_bottom = 450.0
+text = "广 州"
+[node name="RouteInfo" type="Label" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 230.0
+offset_top = 500.0
+offset_right = 820.0
+offset_bottom = 550.0
+theme_override_font_sizes/font_size = 18
+text = "尚未选择目的港。"
+[node name="SailButton" type="Button" parent="OuterMargin/RootVBox/MainTabs/航海图"]
+offset_left = 835.0
+offset_top = 500.0
+offset_right = 1035.0
+offset_bottom = 558.0
+text = "扬 帆 出 航"
+disabled = true
 
-[node name="DestinationTitle" type="Label" parent="Margin/MainVBox/Body/SidePanel/SideVBox"]
+[node name="BottomLog" type="PanelContainer" parent="OuterMargin/RootVBox"]
+custom_minimum_size = Vector2(0, 82)
 layout_mode = 2
-text = "选择目的港"
-
-[node name="DestinationOption" type="OptionButton" parent="Margin/MainVBox/Body/SidePanel/SideVBox"]
+[node name="LogMargin" type="MarginContainer" parent="OuterMargin/RootVBox/BottomLog"]
 layout_mode = 2
-
-[node name="SailButton" type="Button" parent="Margin/MainVBox/Body/SidePanel/SideVBox"]
-custom_minimum_size = Vector2(0, 50)
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 10
+[node name="LogHBox" type="HBoxContainer" parent="OuterMargin/RootVBox/BottomLog/LogMargin"]
 layout_mode = 2
-text = "出航"
-
-[node name="EventHint" type="Label" parent="Margin/MainVBox/Body/SidePanel/SideVBox"]
+theme_override_constants/separation = 14
+[node name="Portrait" type="Label" parent="OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox"]
+custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
-text = "航行可能发生：平安 / 延误 / 货损"
-autowrap_mode = 2
-
-[node name="LogPanel" type="PanelContainer" parent="Margin/MainVBox"]
-custom_minimum_size = Vector2(0, 90)
+theme_override_font_sizes/font_size = 18
+text = "商 人"
+vertical_alignment = 1
+horizontal_alignment = 1
+[node name="LogLabel" type="Label" parent="OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox"]
 layout_mode = 2
-
-[node name="LogMargin" type="MarginContainer" parent="Margin/MainVBox/LogPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 12
-
-[node name="LogLabel" type="Label" parent="Margin/MainVBox/LogPanel/LogMargin"]
-layout_mode = 2
-text = "准备出航。"
+size_flags_horizontal = 3
+text = "客官，今日想看些什么货？"
 vertical_alignment = 1
 autowrap_mode = 2
