@@ -24,6 +24,7 @@ func _init() -> void:
 	_test_sell_profit()
 	_test_voyage_state_transition()
 	_test_save_load_round_trip()
+	_test_three_port_trade_loop()
 
 	print("")
 	print("Tests: %d passed, %d failed" % [passed, failed])
@@ -91,3 +92,44 @@ func _expect(condition: bool, name: String) -> void:
 	else:
 		failed += 1
 		push_error("FAIL: %s" % name)
+
+
+func _test_three_port_trade_loop() -> void:
+	var player = _new_player()
+
+	var buy_silk := TradeService.buy(player, goods["silk"], ports["ningbo"].prices["silk"], 5, goods)
+	var leg_one := VoyageService.start_voyage(player, ports["ningbo"], ports["guangzhou"])
+	var leg_one_done := VoyageService.complete_voyage(player, leg_one["voyage"])
+	var sell_silk := TradeService.sell(player, goods["silk"], ports["guangzhou"].prices["silk"], 5)
+
+	var buy_sugar := TradeService.buy(player, goods["sugar"], ports["guangzhou"].prices["sugar"], 10, goods)
+	var leg_two := VoyageService.start_voyage(player, ports["guangzhou"], ports["quanzhou"])
+	var leg_two_done := VoyageService.complete_voyage(player, leg_two["voyage"])
+	var sell_sugar := TradeService.sell(player, goods["sugar"], ports["quanzhou"].prices["sugar"], 10)
+
+	var buy_pepper := TradeService.buy(player, goods["pepper"], ports["quanzhou"].prices["pepper"], 5, goods)
+	var leg_three := VoyageService.start_voyage(player, ports["quanzhou"], ports["ningbo"])
+	var leg_three_done := VoyageService.complete_voyage(player, leg_three["voyage"])
+	var sell_pepper := TradeService.sell(player, goods["pepper"], ports["ningbo"].prices["pepper"], 5)
+
+	var all_ok := (
+		buy_silk.get("ok", false)
+		and leg_one.get("ok", false)
+		and leg_one_done.get("ok", false)
+		and sell_silk.get("ok", false)
+		and buy_sugar.get("ok", false)
+		and leg_two.get("ok", false)
+		and leg_two_done.get("ok", false)
+		and sell_sugar.get("ok", false)
+		and buy_pepper.get("ok", false)
+		and leg_three.get("ok", false)
+		and leg_three_done.get("ok", false)
+		and sell_pepper.get("ok", false)
+	)
+
+	_expect(all_ok
+		and player.current_port_id == "ningbo"
+		and player.day == 14
+		and player.money == 1205
+		and player.cargo.is_empty(),
+		"three-port trade loop returns to Ningbo with profit")
