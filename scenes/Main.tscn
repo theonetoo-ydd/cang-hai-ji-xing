@@ -59,7 +59,7 @@ theme_override_font_sizes/font_size = 28
 text = "沧 海 纪 行"
 [node name="Subtitle" type="Label" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/Brand"]
 layout_mode = 2
-text = "明代航海 · 贸易 · 探索"
+text = "明代航海 · 贸易 · 探索　|　v0.5 PLAYTEST"
 
 [node name="DateLabel" type="Label" parent="OuterMargin/RootVBox/TopBar/TopMargin/TopHBox"]
 custom_minimum_size = Vector2(180, 0)
