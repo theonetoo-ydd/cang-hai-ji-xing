@@ -66,7 +66,7 @@ border_width_left = 2
 border_color = Color(0.88, 0.67, 0.3, 1)
 
 [resource]
-default_font_size = 16
+default_font_size = 17
 Label/colors/font_color = Color(0.9, 0.86, 0.72, 1)
 Button/colors/font_color = Color(0.91, 0.86, 0.7, 1)
 Button/colors/font_hover_color = Color(1, 0.91, 0.62, 1)
@@ -78,3 +78,6 @@ ItemList/colors/font_color = Color(0.88, 0.84, 0.7, 1)
 ItemList/styles/panel = SubResource("ItemList")
 ItemList/styles/selected = SubResource("Selected")
 TabContainer/colors/font_selected_color = Color(0.96, 0.79, 0.42, 1)
+
+HSeparator/colors/separator = Color(0.48, 0.38, 0.22, 0.7)
+SpinBox/colors/font_color = Color(0.92, 0.86, 0.7, 1)
