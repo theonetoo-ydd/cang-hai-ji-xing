@@ -6,6 +6,7 @@ const PlayerStateScript = preload("res://src/models/player_state.gd")
 const TradeService = preload("res://src/economy/trade_service.gd")
 const VoyageService = preload("res://src/sailing/voyage_service.gd")
 const EventService = preload("res://src/sailing/event_service.gd")
+const SaveService = preload("res://src/save/save_service.gd")
 
 @onready var location_label: Label = $Margin/MainVBox/Header/LocationLabel
 @onready var stats_label: Label = $Margin/MainVBox/Header/StatsLabel
@@ -16,6 +17,8 @@ const EventService = preload("res://src/sailing/event_service.gd")
 @onready var cargo_label: Label = $Margin/MainVBox/Body/SidePanel/SideVBox/CargoLabel
 @onready var destination_option: OptionButton = $Margin/MainVBox/Body/SidePanel/SideVBox/DestinationOption
 @onready var sail_button: Button = $Margin/MainVBox/Body/SidePanel/SideVBox/SailButton
+@onready var save_button: Button = $Margin/MainVBox/Header/SaveButton
+@onready var load_button: Button = $Margin/MainVBox/Header/LoadButton
 @onready var log_label: Label = $Margin/MainVBox/LogPanel/LogMargin/LogLabel
 
 var goods: Dictionary = {}
@@ -38,6 +41,8 @@ func _ready() -> void:
 	buy_button.pressed.connect(_on_buy_pressed)
 	sell_button.pressed.connect(_on_sell_pressed)
 	sail_button.pressed.connect(_on_sail_pressed)
+	save_button.pressed.connect(_on_save_pressed)
+	load_button.pressed.connect(_on_load_pressed)
 
 	_refresh_all()
 	_set_log("船已泊于宁波。先选择商品进行交易，再选择目的港出航。")
@@ -215,3 +220,31 @@ func _on_sail_pressed() -> void:
 func _set_log(message: String) -> void:
 	log_label.text = message
 	print(message)
+
+
+func _on_save_pressed() -> void:
+	var result := SaveService.save_game(player)
+	_set_log(result.get("message", "存档操作完成。"))
+
+func _on_load_pressed() -> void:
+	var result := SaveService.load_game()
+	if not result.get("ok", false):
+		_set_log("读取失败：%s" % result.get("message", "未知错误"))
+		return
+
+	var loaded_player = result.get("player")
+	if loaded_player == null:
+		_set_log("读取失败：存档中没有有效玩家状态。")
+		return
+
+	if not ports.has(loaded_player.current_port_id):
+		_set_log("读取失败：存档中的港口不存在于当前数据。")
+		return
+
+	player = loaded_player
+	_refresh_all()
+	_set_log("读取成功：回到%s，第 %d 天，资金 %d。" % [
+		ports[player.current_port_id].display_name,
+		player.day,
+		player.money
+	])
