@@ -1,0 +1,83 @@
+[gd_resource type="Theme" load_steps=7 format=3]
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.075, 0.105, 0.105, 0.97)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.55, 0.43, 0.24, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+content_margin_left = 14.0
+content_margin_top = 12.0
+content_margin_right = 14.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
+bg_color = Color(0.11, 0.16, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.38, 0.22, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+bg_color = Color(0.18, 0.25, 0.23, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.82, 0.65, 0.34, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
+bg_color = Color(0.38, 0.25, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9, 0.7, 0.35, 1)
+
+[sub_resource type="StyleBoxFlat" id="ItemList"]
+bg_color = Color(0.045, 0.075, 0.075, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.31, 0.29, 0.2, 1)
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="Selected"]
+bg_color = Color(0.36, 0.26, 0.13, 1)
+border_width_left = 2
+border_color = Color(0.88, 0.67, 0.3, 1)
+
+[resource]
+default_font_size = 17
+Label/colors/font_color = Color(0.9, 0.86, 0.72, 1)
+Button/colors/font_color = Color(0.91, 0.86, 0.7, 1)
+Button/colors/font_hover_color = Color(1, 0.91, 0.62, 1)
+Button/styles/normal = SubResource("ButtonNormal")
+Button/styles/hover = SubResource("ButtonHover")
+Button/styles/pressed = SubResource("ButtonPressed")
+PanelContainer/styles/panel = SubResource("Panel")
+ItemList/colors/font_color = Color(0.88, 0.84, 0.7, 1)
+ItemList/styles/panel = SubResource("ItemList")
+ItemList/styles/selected = SubResource("Selected")
+TabContainer/colors/font_selected_color = Color(0.96, 0.79, 0.42, 1)
+
+HSeparator/colors/separator = Color(0.48, 0.38, 0.22, 0.7)
+SpinBox/colors/font_color = Color(0.92, 0.86, 0.7, 1)
