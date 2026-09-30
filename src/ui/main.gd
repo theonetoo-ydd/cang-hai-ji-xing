@@ -36,13 +36,15 @@ const SaveService = preload("res://src/save/save_service.gd")
 @onready var guangzhou_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/GuangzhouButton
 @onready var route_info: Label = $OuterMargin/RootVBox/MainTabs/航海图/RouteInfo
 @onready var sail_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/SailButton
-@onready var portrait_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/Portrait\n@onready var log_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/LogLabel
+@onready var portrait_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/Portrait
+@onready var log_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/LogLabel
 
 var goods: Dictionary = {}
 var ports: Dictionary = {}
 var player
 var market_good_ids: Array[String] = []
-var selected_destination_id := ""\nvar last_money := 1000
+var selected_destination_id := ""
+var last_money := 1000
 
 const PORT_FLAVOR := {
 	"ningbo": "东海商舶云集之地",
@@ -111,9 +113,9 @@ func _refresh_header() -> void:
 	date_label.text = "航海历 · 第 %d 天" % player.day
 	var delta := player.money - last_money
 	if delta == 0:
-	\tmoney_label.text = "银两 %d" % player.money
+		money_label.text = "银两 %d" % player.money
 	else:
-	\tmoney_label.text = "银两 %d　%+d" % [player.money, delta]
+		money_label.text = "银两 %d　%+d" % [player.money, delta]
 	last_money = player.money
 
 func _refresh_port() -> void:
@@ -126,7 +128,10 @@ func _refresh_port() -> void:
 	scene_sky.color = scene.get("color", Color(0.34, 0.48, 0.49, 1))
 	time_badge.text = _time_badge()
 	capacity_label.text = "货舱 %d/%d" % [player.used_capacity(goods), player.ship.capacity]
-	ship_label.text = "福船 · 近海商船\n耐久 %d / 100\n货舱 %d / %d\n状态：泊港整备" % [
+	ship_label.text = "福船 · 近海商船
+耐久 %d / 100
+货舱 %d / %d
+状态：泊港整备" % [
 		player.ship.condition,
 		player.used_capacity(goods),
 		player.ship.capacity
@@ -160,14 +165,18 @@ func _refresh_market() -> void:
 
 func _refresh_cargo() -> void:
 	if player.cargo.is_empty():
-		cargo_label.text = "货 舱\n\n（空）"
+		cargo_label.text = "货 舱
+
+（空）"
 		return
 	var lines: Array[String] = ["货 舱", ""]
 	for good_id in player.cargo:
 		var item = player.cargo[good_id]
 		var name := goods[good_id].display_name if goods.has(good_id) else good_id
-		lines.append("%s × %d\n成本 %.1f" % [name, item.quantity, item.average_buy_price])
-	cargo_label.text = "\n".join(lines)
+		lines.append("%s × %d
+成本 %.1f" % [name, item.quantity, item.average_buy_price])
+	cargo_label.text = "
+".join(lines)
 
 func _refresh_map() -> void:
 	selected_destination_id = ""
