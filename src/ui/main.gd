@@ -13,6 +13,10 @@ const SaveService = preload("res://src/save/save_service.gd")
 @onready var money_label: Label = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/MoneyLabel
 @onready var save_button: Button = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/SaveButton
 @onready var load_button: Button = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/LoadButton
+@onready var help_button: Button = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/HelpButton
+@onready var tutorial_panel: PanelContainer = $TutorialPanel
+@onready var tutorial_status: Label = $TutorialPanel/TutorialMargin/TutorialVBox/TutorialStatus
+@onready var tutorial_close: Button = $TutorialPanel/TutorialMargin/TutorialVBox/TutorialClose
 @onready var port_name: Label = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/PortName
 @onready var port_flavor: Label = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/PortFlavor
 @onready var map_nav: Button = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/MapNav
@@ -85,6 +89,8 @@ func _ready() -> void:
 	map_nav.pressed.connect(_open_map)
 	save_button.pressed.connect(_on_save_pressed)
 	load_button.pressed.connect(_on_load_pressed)
+	help_button.pressed.connect(_on_help_pressed)
+	tutorial_close.pressed.connect(_on_tutorial_close_pressed)
 	ningbo_button.pressed.connect(_select_destination.bind("ningbo"))
 	quanzhou_button.pressed.connect(_select_destination.bind("quanzhou"))
 	guangzhou_button.pressed.connect(_select_destination.bind("guangzhou"))
@@ -99,6 +105,7 @@ func _refresh_all() -> void:
 	_refresh_market()
 	_refresh_cargo()
 	_refresh_map()
+	_update_tutorial_hint()
 
 func _refresh_header() -> void:
 	date_label.text = "航海历 · 第 %d 天" % player.day
@@ -315,3 +322,27 @@ func _market_hint(good_id: String, price) -> String:
 	if price.buy_price >= 100:
 		return "价高"
 	return "平稳"
+
+
+func _on_help_pressed() -> void:
+	tutorial_panel.visible = true
+	_update_tutorial_hint()
+
+func _on_tutorial_close_pressed() -> void:
+	tutorial_panel.visible = false
+
+func _update_tutorial_hint() -> void:
+	if tutorial_status == null or player == null:
+		return
+
+	var silk_quantity := player.cargo_quantity("silk")
+	if player.current_port_id == "ningbo" and silk_quantity == 0:
+		tutorial_status.text = "当前目标 1/4：选择【绫】丝绸，建议先买 5 份。"
+	elif player.current_port_id == "ningbo" and silk_quantity > 0:
+		tutorial_status.text = "当前目标 2/4：打开海图，选择广州并出航。"
+	elif player.current_port_id == "guangzhou" and silk_quantity > 0:
+		tutorial_status.text = "当前目标 3/4：在广州商馆卖出携带的丝绸。"
+	elif player.current_port_id == "guangzhou" and player.money > 1000:
+		tutorial_status.text = "初航完成：第一笔跨港贸易已盈利。接下来可以自由跑商。"
+	else:
+		tutorial_status.text = "自由航行：比较各港买卖价，低买高卖，留意货舱容量。"
