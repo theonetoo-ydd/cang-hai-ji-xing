@@ -117,6 +117,30 @@ godot --path .
 
 技术栈决策见 [docs/ADR-001-tech-stack.md](docs/ADR-001-tech-stack.md)。
 
+## 存档与测试
+
+游戏顶部提供 **保存 / 读取**。单档存档写入 Godot 的用户数据目录：
+
+```text
+user://savegame.json
+```
+
+保存内容包括当前港口、游戏天数、资金、船只状态与货舱。
+
+无需第三方测试框架即可运行首版回归测试：
+
+```bash
+godot --headless --path . --script res://tests/test_runner.gd
+```
+
+部分环境使用：
+
+```bash
+godot4 --headless --path . --script res://tests/test_runner.gd
+```
+
+测试通过时退出码为 0，失败时为 1。
+
 ## Git 工作流
 
 `main` 始终保持可用。日常开发从 `main` 新建短分支：
