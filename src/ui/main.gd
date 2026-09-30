@@ -16,6 +16,10 @@ const SaveService = preload("res://src/save/save_service.gd")
 @onready var port_name: Label = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/PortName
 @onready var port_flavor: Label = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/PortFlavor
 @onready var map_nav: Button = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/MapNav
+@onready var scene_sky: ColorRect = $OuterMargin/RootVBox/MainTabs/港口/PortScene/SceneVBox/SceneSky
+@onready var scene_title: Label = $OuterMargin/RootVBox/MainTabs/港口/PortScene/SceneVBox/SceneTitle
+@onready var scene_description: Label = $OuterMargin/RootVBox/MainTabs/港口/PortScene/SceneVBox/SceneDescription
+@onready var time_badge: Label = $OuterMargin/RootVBox/MainTabs/港口/PortScene/SceneVBox/TimeBadge
 @onready var capacity_label: Label = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/MarketHeader/CapacityLabel
 @onready var market_list: ItemList = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/MarketList
 @onready var quantity_spin: SpinBox = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow/QuantitySpin
@@ -40,6 +44,33 @@ const PORT_FLAVOR := {
 	"ningbo": "东海商舶云集之地",
 	"quanzhou": "刺桐旧港，南货北珍交汇",
 	"guangzhou": "南海门户，番舶百货所聚",
+}
+
+const PORT_SCENES := {
+	"ningbo": {
+		"title": "东海晨雾",
+		"description": "潮声拍岸，帆樯在薄雾中次第显现。来自江南的丝绸与瓷器正装上商船。",
+		"color": Color(0.34, 0.48, 0.49, 1),
+	},
+	"quanzhou": {
+		"title": "刺桐斜阳",
+		"description": "夕光落在石岸与桅杆之间。南北货物在码头交汇，海商正在议价。",
+		"color": Color(0.52, 0.36, 0.23, 1),
+	},
+	"guangzhou": {
+		"title": "南海晴岚",
+		"description": "暖风越过珠江口，远来番舶停泊外港。香料、砂糖与百货汇聚于此。",
+		"color": Color(0.28, 0.45, 0.4, 1),
+	},
+}
+
+const GOOD_MARKS := {
+	"silk": "绫",
+	"porcelain": "瓷",
+	"tea": "茶",
+	"copper": "铜",
+	"pepper": "香",
+	"sugar": "糖",
 }
 
 func _ready() -> void:
@@ -77,8 +108,13 @@ func _refresh_port() -> void:
 	var port = ports[player.current_port_id]
 	port_name.text = "%s港" % port.display_name
 	port_flavor.text = PORT_FLAVOR.get(player.current_port_id, "海路通商之港")
+	var scene: Dictionary = PORT_SCENES.get(player.current_port_id, {})
+	scene_title.text = str(scene.get("title", "海港风物"))
+	scene_description.text = str(scene.get("description", "潮来潮往，商旅不绝。"))
+	scene_sky.color = scene.get("color", Color(0.34, 0.48, 0.49, 1))
+	time_badge.text = _time_badge()
 	capacity_label.text = "货舱 %d/%d" % [player.used_capacity(goods), player.ship.capacity]
-	ship_label.text = "初云号\n船况 %d%%\n货舱 %d/%d" % [
+	ship_label.text = "福船 · 近海商船\n耐久 %d / 100\n货舱 %d / %d\n状态：泊港整备" % [
 		player.ship.condition,
 		player.used_capacity(goods),
 		player.ship.capacity
@@ -96,8 +132,11 @@ func _refresh_market() -> void:
 		var good = goods[good_id]
 		var price = port.prices[good_id]
 		market_good_ids.append(good_id)
-		market_list.add_item("%-8s　买 %4d　卖 %4d　持有 %2d" % [
-			good.display_name, price.buy_price, price.sell_price, player.cargo_quantity(good_id)
+		var trend := _market_hint(good_id, price)
+		var mark: String = GOOD_MARKS.get(good_id, "货")
+		market_list.add_item("【%s】%-6s　买 %4d　卖 %4d　持有 %2d　%s" % [
+			mark, good.display_name, price.buy_price, price.sell_price,
+			player.cargo_quantity(good_id), trend
 		])
 
 	if selected_good_id != "":
@@ -237,3 +276,29 @@ func _on_load_pressed() -> void:
 func _set_log(message: String) -> void:
 	log_label.text = message
 	print(message)
+
+
+func _time_badge() -> String:
+	var phase := player.day % 4
+	match phase:
+		0:
+			return "卯时 · 晨雾"
+		1:
+			return "辰时 · 微风"
+		2:
+			return "午后 · 晴"
+		_:
+			return "酉时 · 斜阳"
+
+func _market_hint(good_id: String, price) -> String:
+	var good = goods.get(good_id)
+	if good == null:
+		return "行情平"
+	var spread: int = price.buy_price - price.sell_price
+	if price.buy_price <= 55:
+		return "价低"
+	if spread <= 5:
+		return "活跃"
+	if price.buy_price >= 100:
+		return "价高"
+	return "平稳"
