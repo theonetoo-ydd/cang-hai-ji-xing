@@ -32,13 +32,13 @@ const SaveService = preload("res://src/save/save_service.gd")
 @onready var guangzhou_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/GuangzhouButton
 @onready var route_info: Label = $OuterMargin/RootVBox/MainTabs/航海图/RouteInfo
 @onready var sail_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/SailButton
-@onready var log_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/LogLabel
+@onready var portrait_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/Portrait\n@onready var log_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/LogLabel
 
 var goods: Dictionary = {}
 var ports: Dictionary = {}
 var player
 var market_good_ids: Array[String] = []
-var selected_destination_id := ""
+var selected_destination_id := ""\nvar last_money := 1000
 
 const PORT_FLAVOR := {
 	"ningbo": "东海商舶云集之地",
@@ -102,7 +102,7 @@ func _refresh_all() -> void:
 
 func _refresh_header() -> void:
 	date_label.text = "航海历 · 第 %d 天" % player.day
-	money_label.text = "银两 %d" % player.money
+	var delta := player.money - last_money\n\tif delta == 0:\n\t\tmoney_label.text = "银两 %d" % player.money\n\telse:\n\t\tmoney_label.text = "银两 %d　%+d" % [player.money, delta]\n\tlast_money = player.money
 
 func _refresh_port() -> void:
 	var port = ports[player.current_port_id]
@@ -200,9 +200,9 @@ func _on_buy_pressed() -> void:
 	var port = ports[player.current_port_id]
 	var result := TradeService.buy(player, goods[good_id], port.prices[good_id], quantity, goods)
 	if result.get("ok", false):
-		_set_log("掌柜：收您 %d 两。%d 份%s已经装船。" % [result["total_cost"], quantity, goods[good_id].display_name])
+		_set_speaker("商 馆 掌 柜")\n\t	_set_log("成交。收您 %d 两，%d 份%s已经装船。" % [result["total_cost"], quantity, goods[good_id].display_name])
 	else:
-		_set_log("掌柜：这笔买卖做不成——%s" % result.get("message", "未知错误"))
+		_set_speaker("商 馆 掌 柜")\n\t	_set_log("这笔买卖做不成——%s" % result.get("message", "未知错误"))
 	_refresh_all()
 
 func _on_sell_pressed() -> void:
@@ -213,7 +213,7 @@ func _on_sell_pressed() -> void:
 	var port = ports[player.current_port_id]
 	var result := TradeService.sell(player, goods[good_id], port.prices[good_id], quantity)
 	if result.get("ok", false):
-		_set_log("掌柜：货收下了。入账 %d 两，本笔盈亏 %+.0f。" % [result["revenue"], result["profit"]])
+		_set_speaker("商 馆 掌 柜")\n\t	_set_log("货收下了。入账 %d 两，本笔盈亏 %+.0f。" % [result["revenue"], result["profit"]])
 	else:
 		_set_log("掌柜：这笔买卖做不成——%s" % result.get("message", "未知错误"))
 	_refresh_all()
@@ -221,7 +221,7 @@ func _on_sell_pressed() -> void:
 func _open_map() -> void:
 	tabs.current_tab = 1
 	_refresh_map()
-	_set_log("舵手：请在海图上指定下一处港口。")
+	_set_speaker("舵 手")\n\t_set_log("请在海图上指定下一处港口。")
 
 func _select_destination(port_id: String) -> void:
 	if not ports[player.current_port_id].routes.has(port_id):
@@ -253,7 +253,7 @@ func _on_sail_pressed() -> void:
 
 	tabs.current_tab = 0
 	_refresh_all()
-	_set_log("抵达%s。%s" % [destination.display_name, event_result.get("message", "")])
+	_set_speaker("航 海 日 志")\n\t_set_log("抵达%s。%s" % [destination.display_name, event_result.get("message", "")])
 
 func _on_save_pressed() -> void:
 	var result := SaveService.save_game(player)
