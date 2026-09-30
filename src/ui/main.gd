@@ -8,24 +8,39 @@ const VoyageService = preload("res://src/sailing/voyage_service.gd")
 const EventService = preload("res://src/sailing/event_service.gd")
 const SaveService = preload("res://src/save/save_service.gd")
 
-@onready var location_label: Label = $Margin/MainVBox/Header/LocationLabel
-@onready var stats_label: Label = $Margin/MainVBox/Header/StatsLabel
-@onready var market_list: ItemList = $Margin/MainVBox/Body/MarketPanel/MarketVBox/MarketList
-@onready var quantity_spin: SpinBox = $Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow/QuantitySpin
-@onready var buy_button: Button = $Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow/BuyButton
-@onready var sell_button: Button = $Margin/MainVBox/Body/MarketPanel/MarketVBox/TradeRow/SellButton
-@onready var cargo_label: Label = $Margin/MainVBox/Body/SidePanel/SideVBox/CargoLabel
-@onready var destination_option: OptionButton = $Margin/MainVBox/Body/SidePanel/SideVBox/DestinationOption
-@onready var sail_button: Button = $Margin/MainVBox/Body/SidePanel/SideVBox/SailButton
-@onready var save_button: Button = $Margin/MainVBox/Header/SaveButton
-@onready var load_button: Button = $Margin/MainVBox/Header/LoadButton
-@onready var log_label: Label = $Margin/MainVBox/LogPanel/LogMargin/LogLabel
+@onready var tabs: TabContainer = $OuterMargin/RootVBox/MainTabs
+@onready var date_label: Label = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/DateLabel
+@onready var money_label: Label = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/MoneyLabel
+@onready var save_button: Button = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/SaveButton
+@onready var load_button: Button = $OuterMargin/RootVBox/TopBar/TopMargin/TopHBox/LoadButton
+@onready var port_name: Label = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/PortName
+@onready var port_flavor: Label = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/PortFlavor
+@onready var map_nav: Button = $OuterMargin/RootVBox/MainTabs/港口/NavPanel/NavVBox/MapNav
+@onready var capacity_label: Label = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/MarketHeader/CapacityLabel
+@onready var market_list: ItemList = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/MarketList
+@onready var quantity_spin: SpinBox = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow/QuantitySpin
+@onready var buy_button: Button = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow/BuyButton
+@onready var sell_button: Button = $OuterMargin/RootVBox/MainTabs/港口/MarketPanel/MarketVBox/TradeRow/SellButton
+@onready var ship_label: Label = $OuterMargin/RootVBox/MainTabs/港口/RightPanel/RightVBox/ShipLabel
+@onready var cargo_label: Label = $OuterMargin/RootVBox/MainTabs/港口/RightPanel/RightVBox/CargoLabel
+@onready var ningbo_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/NingboButton
+@onready var quanzhou_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/QuanzhouButton
+@onready var guangzhou_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/GuangzhouButton
+@onready var route_info: Label = $OuterMargin/RootVBox/MainTabs/航海图/RouteInfo
+@onready var sail_button: Button = $OuterMargin/RootVBox/MainTabs/航海图/SailButton
+@onready var log_label: Label = $OuterMargin/RootVBox/BottomLog/LogMargin/LogHBox/LogLabel
 
 var goods: Dictionary = {}
 var ports: Dictionary = {}
 var player
 var market_good_ids: Array[String] = []
-var destination_ids: Array[String] = []
+var selected_destination_id := ""
+
+const PORT_FLAVOR := {
+	"ningbo": "东海商舶云集之地",
+	"quanzhou": "刺桐旧港，南货北珍交汇",
+	"guangzhou": "南海门户，番舶百货所聚",
+}
 
 func _ready() -> void:
 	var game_data := GameDataScript.load_all()
@@ -33,33 +48,38 @@ func _ready() -> void:
 	ports = game_data.get("ports", {})
 	player = PlayerStateScript.new(1000, "ningbo", ShipScript.new("starter_ship", 20, 100))
 
-	if goods.is_empty() or ports.is_empty():
-		_set_log("数据加载失败，请检查 data/ 目录。")
-		return
-
 	market_list.item_selected.connect(_on_market_item_selected)
 	buy_button.pressed.connect(_on_buy_pressed)
 	sell_button.pressed.connect(_on_sell_pressed)
-	sail_button.pressed.connect(_on_sail_pressed)
+	map_nav.pressed.connect(_open_map)
 	save_button.pressed.connect(_on_save_pressed)
 	load_button.pressed.connect(_on_load_pressed)
+	ningbo_button.pressed.connect(_select_destination.bind("ningbo"))
+	quanzhou_button.pressed.connect(_select_destination.bind("quanzhou"))
+	guangzhou_button.pressed.connect(_select_destination.bind("guangzhou"))
+	sail_button.pressed.connect(_on_sail_pressed)
 
 	_refresh_all()
-	_set_log("船已泊于宁波。先选择商品进行交易，再选择目的港出航。")
+	_set_log("客官，船已泊于宁波。可先在商馆采买，再从海图选择航路。")
 
 func _refresh_all() -> void:
 	_refresh_header()
+	_refresh_port()
 	_refresh_market()
 	_refresh_cargo()
-	_refresh_destinations()
-	_refresh_trade_buttons()
+	_refresh_map()
 
 func _refresh_header() -> void:
+	date_label.text = "航海历 · 第 %d 天" % player.day
+	money_label.text = "银两 %d" % player.money
+
+func _refresh_port() -> void:
 	var port = ports[player.current_port_id]
-	location_label.text = "当前港口：%s" % port.display_name
-	stats_label.text = "第 %d 天　资金：%d　货舱：%d/%d" % [
-		player.day,
-		player.money,
+	port_name.text = "%s港" % port.display_name
+	port_flavor.text = PORT_FLAVOR.get(player.current_port_id, "海路通商之港")
+	capacity_label.text = "货舱 %d/%d" % [player.used_capacity(goods), player.ship.capacity]
+	ship_label.text = "初云号\n船况 %d%%\n货舱 %d/%d" % [
+		player.ship.condition,
 		player.used_capacity(goods),
 		player.ship.capacity
 	]
@@ -67,7 +87,6 @@ func _refresh_header() -> void:
 func _refresh_market() -> void:
 	var selected_good_id := _selected_good_id()
 	var port = ports[player.current_port_id]
-
 	market_list.clear()
 	market_good_ids.clear()
 
@@ -76,62 +95,51 @@ func _refresh_market() -> void:
 			continue
 		var good = goods[good_id]
 		var price = port.prices[good_id]
-		var owned := player.cargo_quantity(good_id)
 		market_good_ids.append(good_id)
-		market_list.add_item("%s　买 %d / 卖 %d　持有 %d" % [
-			good.display_name,
-			price.buy_price,
-			price.sell_price,
-			owned
+		market_list.add_item("%-8s　买 %4d　卖 %4d　持有 %2d" % [
+			good.display_name, price.buy_price, price.sell_price, player.cargo_quantity(good_id)
 		])
 
 	if selected_good_id != "":
 		var index := market_good_ids.find(selected_good_id)
 		if index >= 0:
 			market_list.select(index)
-
 	if market_list.get_selected_items().is_empty() and market_list.item_count > 0:
 		market_list.select(0)
 
 func _refresh_cargo() -> void:
 	if player.cargo.is_empty():
-		cargo_label.text = "货舱\n\n（空）"
+		cargo_label.text = "货 舱\n\n（空）"
 		return
-
-	var lines: Array[String] = ["货舱"]
+	var lines: Array[String] = ["货 舱", ""]
 	for good_id in player.cargo:
 		var item = player.cargo[good_id]
-		var good_name := good_id
-		if goods.has(good_id):
-			good_name = goods[good_id].display_name
-		lines.append("%s × %d　均价 %.1f" % [good_name, item.quantity, item.average_buy_price])
-
+		var name := goods[good_id].display_name if goods.has(good_id) else good_id
+		lines.append("%s × %d\n成本 %.1f" % [name, item.quantity, item.average_buy_price])
 	cargo_label.text = "\n".join(lines)
 
-func _refresh_destinations() -> void:
-	var previous_id := _selected_destination_id()
-	var port = ports[player.current_port_id]
+func _refresh_map() -> void:
+	selected_destination_id = ""
+	route_info.text = "当前停泊：%s。请选择可达港口。" % ports[player.current_port_id].display_name
+	sail_button.disabled = true
 
-	destination_option.clear()
-	destination_ids.clear()
-
-	for destination_id in port.routes:
-		if not ports.has(destination_id):
-			continue
-		destination_ids.append(destination_id)
-		var destination = ports[destination_id]
-		destination_option.add_item("%s（%d 天）" % [destination.display_name, port.routes[destination_id]])
-
-	if previous_id != "":
-		var index := destination_ids.find(previous_id)
-		if index >= 0:
-			destination_option.select(index)
-
-func _refresh_trade_buttons() -> void:
-	var has_good := _selected_good_id() != ""
-	buy_button.disabled = not has_good
-	sell_button.disabled = not has_good
-	sail_button.disabled = destination_ids.is_empty()
+	var current = ports[player.current_port_id]
+	for entry in [
+		["ningbo", ningbo_button],
+		["quanzhou", quanzhou_button],
+		["guangzhou", guangzhou_button],
+	]:
+		var port_id: String = entry[0]
+		var button: Button = entry[1]
+		if port_id == player.current_port_id:
+			button.disabled = true
+			button.text = "%s · 当前" % ports[port_id].display_name
+		elif current.routes.has(port_id):
+			button.disabled = false
+			button.text = ports[port_id].display_name
+		else:
+			button.disabled = true
+			button.text = "%s · 未通航" % ports[port_id].display_name
 
 func _selected_good_id() -> String:
 	var selected := market_list.get_selected_items()
@@ -142,85 +150,71 @@ func _selected_good_id() -> String:
 		return ""
 	return market_good_ids[index]
 
-func _selected_destination_id() -> String:
-	var index := destination_option.selected
-	if index < 0 or index >= destination_ids.size():
-		return ""
-	return destination_ids[index]
-
 func _on_market_item_selected(_index: int) -> void:
-	_refresh_trade_buttons()
+	pass
 
 func _on_buy_pressed() -> void:
 	var good_id := _selected_good_id()
 	if good_id == "":
 		return
-
 	var quantity := int(quantity_spin.value)
 	var port = ports[player.current_port_id]
 	var result := TradeService.buy(player, goods[good_id], port.prices[good_id], quantity, goods)
-
 	if result.get("ok", false):
-		_set_log("买入 %d 份%s，支出 %d。" % [quantity, goods[good_id].display_name, result["total_cost"]])
+		_set_log("掌柜：收您 %d 两。%d 份%s已经装船。" % [result["total_cost"], quantity, goods[good_id].display_name])
 	else:
-		_set_log("买入失败：%s" % result.get("message", "未知错误"))
-
+		_set_log("掌柜：这笔买卖做不成——%s" % result.get("message", "未知错误"))
 	_refresh_all()
 
 func _on_sell_pressed() -> void:
 	var good_id := _selected_good_id()
 	if good_id == "":
 		return
-
 	var quantity := int(quantity_spin.value)
 	var port = ports[player.current_port_id]
 	var result := TradeService.sell(player, goods[good_id], port.prices[good_id], quantity)
-
 	if result.get("ok", false):
-		_set_log("卖出 %d 份%s，收入 %d，本笔利润 %.0f。" % [
-			quantity,
-			goods[good_id].display_name,
-			result["revenue"],
-			result["profit"]
-		])
+		_set_log("掌柜：货收下了。入账 %d 两，本笔盈亏 %+.0f。" % [result["revenue"], result["profit"]])
 	else:
-		_set_log("卖出失败：%s" % result.get("message", "未知错误"))
-
+		_set_log("掌柜：这笔买卖做不成——%s" % result.get("message", "未知错误"))
 	_refresh_all()
+
+func _open_map() -> void:
+	tabs.current_tab = 1
+	_refresh_map()
+	_set_log("舵手：请在海图上指定下一处港口。")
+
+func _select_destination(port_id: String) -> void:
+	if not ports[player.current_port_id].routes.has(port_id):
+		return
+	selected_destination_id = port_id
+	var days: int = ports[player.current_port_id].routes[port_id]
+	route_info.text = "%s → %s　预计 %d 天" % [
+		ports[player.current_port_id].display_name,
+		ports[port_id].display_name,
+		days
+	]
+	sail_button.disabled = false
 
 func _on_sail_pressed() -> void:
-	var destination_id := _selected_destination_id()
-	if destination_id == "":
+	if selected_destination_id == "":
 		return
-
 	var origin = ports[player.current_port_id]
-	var destination = ports[destination_id]
-	var start_result := VoyageService.start_voyage(player, origin, destination)
-
-	if not start_result.get("ok", false):
-		_set_log("出航失败：%s" % start_result.get("message", "未知错误"))
+	var destination = ports[selected_destination_id]
+	var result := VoyageService.start_voyage(player, origin, destination)
+	if not result.get("ok", false):
+		_set_log("无法出航：%s" % result.get("message", "未知错误"))
 		return
 
-	var voyage = start_result["voyage"]
 	var event_result := EventService.resolve(player)
-	var arrival_result := VoyageService.complete_voyage(player, voyage)
-
-	if not arrival_result.get("ok", false):
-		_set_log("航行结算失败：%s" % arrival_result.get("message", "未知错误"))
+	var arrival := VoyageService.complete_voyage(player, result["voyage"])
+	if not arrival.get("ok", false):
+		_set_log("航行结算失败。")
 		return
 
-	_set_log("%s → %s，基础航程 %d 天。%s" % [
-		origin.display_name,
-		destination.display_name,
-		arrival_result["days"],
-		event_result.get("message", "")
-	])
+	tabs.current_tab = 0
 	_refresh_all()
-
-func _set_log(message: String) -> void:
-	log_label.text = message
-	print(message)
-
+	_set_log("抵达%s。%s" % [destination.display_name, event_result.get("message", "")])
 
 func _on_save_pressed() -> void:
 	var result := SaveService.save_game(player)
@@ -231,20 +225,15 @@ func _on_load_pressed() -> void:
 	if not result.get("ok", false):
 		_set_log("读取失败：%s" % result.get("message", "未知错误"))
 		return
-
 	var loaded_player = result.get("player")
-	if loaded_player == null:
-		_set_log("读取失败：存档中没有有效玩家状态。")
+	if loaded_player == null or not ports.has(loaded_player.current_port_id):
+		_set_log("读取失败：存档状态无效。")
 		return
-
-	if not ports.has(loaded_player.current_port_id):
-		_set_log("读取失败：存档中的港口不存在于当前数据。")
-		return
-
 	player = loaded_player
+	tabs.current_tab = 0
 	_refresh_all()
-	_set_log("读取成功：回到%s，第 %d 天，资金 %d。" % [
-		ports[player.current_port_id].display_name,
-		player.day,
-		player.money
-	])
+	_set_log("旧航海日志已展开：回到%s，第 %d 天。" % [ports[player.current_port_id].display_name, player.day])
+
+func _set_log(message: String) -> void:
+	log_label.text = message
+	print(message)
